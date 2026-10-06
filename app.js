@@ -32,6 +32,18 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/travel', travelRouter);
 // wire up the API routes
+// Disable ETag so API responses always carry a body
+// rather than a bare 304 Not Modified.
+app.set('etag', false);
+
+// Enable CORS
+app.use('/api', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  next();
+});
+
 app.use('/api', apiRouter);
 
 // catch 404 and forward to error handler
