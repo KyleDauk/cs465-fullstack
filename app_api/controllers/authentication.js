@@ -23,9 +23,14 @@ const register = async (req, res) => {
             .json({ token });
     } catch (err) {
         // A duplicate email trips the unique index and lands here.
+        // Per 5-1 feedback, the raw database error is not returned: it would
+        // expose the index name, the collection and the colliding address.
+        const duplicate = err && (err.code === 11000 || err.code === 11001);
         return res
             .status(400)
-            .json(err);
+            .json({ "message": duplicate
+                ? "That email address is already registered"
+                : "Registration failed" });
     }
 };
 
@@ -42,10 +47,13 @@ const login = (req, res, next) => {
     // Delegate authentication to the passport module
     passport.authenticate('local', (err, user, info) => {
         if (err) {
-            // Error in the authentication process itself
+            // Error in the authentication process itself. Per 5-1 feedback,
+            // the raw error is logged server-side and a generic message is
+            // returned, so internals are not disclosed to the caller.
+            console.log('Authentication error: ' + (err.message || err));
             return res
                 .status(404)
-                .json(err);
+                .json({ "message": "Authentication error" });
         }
 
         if (user) {     // Auth succeeded - generate JWT and return to caller
