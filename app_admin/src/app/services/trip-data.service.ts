@@ -1,17 +1,27 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { Trip } from '../models/trip';
+import { User } from '../models/user';
+import { AuthResponse } from '../models/auth-response';
+import { BROWSER_STORAGE } from '../storage';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TripDataService {
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    @Inject(BROWSER_STORAGE) private storage: Storage
+  ) { }
 
   url = 'http://localhost:3000/api/trips';
+
+  // We are no longer talking to the trips endpoint alone, so the base URL
+  // is kept separately for login, register and anything added later.
+  baseUrl = 'http://localhost:3000/api';
 
   getTrips(): Observable<Trip[]> {
     return this.http.get<Trip[]>(this.url);
@@ -31,5 +41,27 @@ export class TripDataService {
 
   deleteTrip(tripCode: string): Observable<any> {
     return this.http.delete(this.url + '/' + tripCode);
+  }
+
+  // Call to our /login endpoint, returns JWT
+  login(user: User, passwd: string): Observable<AuthResponse> {
+    return this.handleAuthAPICall('login', user, passwd);
+  }
+
+  // Call to our /register endpoint, creates user and returns JWT
+  register(user: User, passwd: string): Observable<AuthResponse> {
+    return this.handleAuthAPICall('register', user, passwd);
+  }
+
+  // login and register differ only in the endpoint they hit, so the shared
+  // work is written and tested once here.
+  handleAuthAPICall(endpoint: string, user: User, passwd: string): Observable<AuthResponse> {
+    const formData = {
+      name: user.name,
+      email: user.email,
+      password: passwd
+    };
+
+    return this.http.post<AuthResponse>(this.baseUrl + '/' + endpoint, formData);
   }
 }

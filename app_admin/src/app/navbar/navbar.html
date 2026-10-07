@@ -1,0 +1,21 @@
+<nav class="navbar navbar-expand navbar-light bg-light">
+  <a class="navbar-brand" href="#">
+    <img src="assets/images/logo.png" alt="Travlr Getaways" height="40">
+  </a>
+
+  <div class="navbar-nav">
+    <a class="nav-link active" routerLink="">Trips</a>
+  </div>
+
+  <div class="navbar-end ms-auto">
+    @if (!isLoggedIn()) {
+      <a class="nav-item nav-link" routerLink="login">
+        <span class="has-icon-left">Log In</span>
+      </a>
+    } @else {
+      <a class="nav-item nav-link" style="cursor: pointer;" (click)="onLogout()">
+        <span class="has-icon-left">Log Out</span>
+      </a>
+    }
+  </div>
+</nav>

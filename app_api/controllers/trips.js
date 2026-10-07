@@ -92,7 +92,7 @@ const tripsUpdateTrip = async (req, res) => {
                 },
                 // new:true returns the updated document rather than the
                 // pre-update one, which is what the Angular client expects back.
-                { new: true }
+                { returnDocument: 'after' }
             )
             .exec();
 
@@ -102,7 +102,7 @@ const tripsUpdateTrip = async (req, res) => {
                 .json({ message: `Trip ${req.params.tripCode} not found` });
         }
         return res
-            .status(201)
+            .status(200)
             .json(q);
     } catch (err) {
         return res
