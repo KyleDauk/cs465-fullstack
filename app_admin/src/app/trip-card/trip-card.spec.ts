@@ -22,7 +22,10 @@ describe('TripCard', () => {
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
-        provideRouter([])
+        // editTrip() navigates to 'edit-trip'. Declaring the route here
+        // keeps that navigation from failing in the background and
+        // reporting an unhandled rejection alongside the passing tests.
+        provideRouter([{ path: 'edit-trip', children: [] }])
       ]
     }).compileComponents();
 
@@ -87,8 +90,8 @@ describe('TripCard', () => {
     expect(fixture.nativeElement.querySelectorAll('button').length).toBe(0);
   });
 
-  it('stashes the trip code and navigates when Edit Trip is pressed', () => {
-    component.editTrip(MOCK_TRIPS[0]);
+  it('stashes the trip code and navigates when Edit Trip is pressed', async () => {
+    await component.editTrip(MOCK_TRIPS[0]);
     expect(localStorage.getItem('tripCode')).toBe('GALR210214');
   });
 });
